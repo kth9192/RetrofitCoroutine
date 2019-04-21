@@ -3,38 +3,52 @@ package com.kth.coroutineretrofit
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
-import com.kth.coroutineretrofit.model.People
-import com.kth.mycoroutine.retrofit.OkHttp3RetrofitManager
+import androidx.databinding.DataBindingUtil
+import androidx.databinding.ObservableBoolean
+import com.kth.coroutineretrofit.databinding.ActivityMainBinding
+import com.kth.coroutineretrofit.retrofit.OkHttp3RetrofitManager
 import com.kth.coroutineretrofit.retrofit.RetrofitService
+import com.orhanobut.logger.Logger
 import kotlinx.android.synthetic.main.activity_main.*
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 
 class MainActivity : AppCompatActivity() {
 
     private val TAG = MainActivity::class.java.simpleName
+    private lateinit var activityMainBinding: ActivityMainBinding
+    private val myScope = GlobalScope
+    private var isLoading: ObservableBoolean = ObservableBoolean(false)
 
-    override fun onCreate(savedInstanceState: Bundle?) {
+    override
+    fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+        activityMainBinding = DataBindingUtil.setContentView(this, R.layout.activity_main)
+        activityMainBinding.isLoading = isLoading
 
         start_routine.setOnClickListener {
-            GlobalScope.launch {
+            isLoading.set(true)
+
+            myScope.launch {
                 testRestAPi()
-            }
+            }.let { isLoading.set(!it.isCompleted) }
         }
     }
 
-    suspend fun testRestAPi() {
-        var retrofitService: RetrofitService = OkHttp3RetrofitManager.retrofit.create(RetrofitService::class.java)
+    private suspend fun testRestAPi() {
+        val retrofitService: RetrofitService = OkHttp3RetrofitManager.retrofit.create(RetrofitService::class.java)
 
         try {
             val result = retrofitService.getPeople("json").await().let {
                 retrofitService.getFilmData("json").await()
             }
-            Log.d(TAG, "결과값 ${result.title}")
-        }catch (e:Exception){
+
+            Logger.d("결과값 ${result.title}")
+
+            content.text = result.title
+
+        } catch (e: Throwable) {
             Log.e(TAG, e.printStackTrace().toString())
         }
+
     }
 }

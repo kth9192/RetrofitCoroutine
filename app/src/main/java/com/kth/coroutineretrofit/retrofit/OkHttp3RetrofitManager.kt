@@ -1,4 +1,4 @@
-package com.kth.mycoroutine.retrofit
+package com.kth.coroutineretrofit.retrofit
 
 import com.jakewharton.retrofit2.adapter.kotlin.coroutines.CoroutineCallAdapterFactory
 import com.kth.coroutineretrofit.Const

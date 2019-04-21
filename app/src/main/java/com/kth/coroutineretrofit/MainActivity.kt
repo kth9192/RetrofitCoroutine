@@ -29,8 +29,10 @@ class MainActivity : AppCompatActivity() {
         var retrofitService: RetrofitService = OkHttp3RetrofitManager.retrofit.create(RetrofitService::class.java)
 
         try {
-            val result = retrofitService.getPeople("json").await()
-            Log.d(TAG, "결과값 ${result.name}")
+            val result = retrofitService.getPeople("json").await().let {
+                retrofitService.getFilmData("json").await()
+            }
+            Log.d(TAG, "결과값 ${result.title}")
         }catch (e:Exception){
             Log.e(TAG, e.printStackTrace().toString())
         }

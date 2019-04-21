@@ -15,6 +15,6 @@ interface RetrofitService {
     @GET("people/1")
     fun getPeople(@Query("format") format:String): Deferred<People>
 
-    @GET("films/")
-    fun getFilmData(@Url url: String, @Query("format") format: String): Deferred<Film>
+    @GET("films/1")
+    fun getFilmData(@Query("format") format: String): Deferred<Film>
 }
